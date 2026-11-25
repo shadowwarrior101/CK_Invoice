@@ -59,3 +59,4 @@
 
 - `BANK_INFO` → `BANKS` map + "Bank Account" select above the bank preview on step 1. Chosen account prints in the invoice/packing list Payment Details (and the unused jsPDF `buildDoc`). Saved in drafts/records; drafts without it load as DBS.
 - YES Bank (Uditnagar): A/C 008127000000363, IFSC YESB0000081, SWIFT YESBINBBCHN. DBS stays the default.
+- A filled LC Number locks the bank to YES Bank (select disabled + note); `selectedBank()` also enforces it, so the document can't print DBS with an LC. Clearing the LC unlocks the select but leaves it on YES Bank.

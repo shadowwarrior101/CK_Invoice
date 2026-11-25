@@ -269,6 +269,7 @@ nav{background:var(--brown);padding:0 36px;display:flex;align-items:center;justi
         <option value="dbs">🇸🇬 DBS Bank Singapore — FAST / SWIFT / MEPS</option>
         <option value="yes_bank">🇮🇳 YES Bank — Uditnagar Branch (India)</option>
       </select>
+      <small id="bankLockNote" style="display:none;color:var(--muted);font-size:.72rem">Locked to YES Bank because an LC number is filled. Clear the LC number to change it.</small>
     </div>
     <div id="bankPreview"></div>
     <div class="card">
@@ -343,7 +344,7 @@ nav{background:var(--brown);padding:0 36px;display:flex;align-items:center;justi
         <div class="g4">
           <div class="f"><label>Proforma Invoice No.</label><input class="mono" id="piNo" placeholder="CKLLP/PI/001/26-27"/></div>
           <div class="f"><label>Proforma Invoice Dated</label><input type="date" id="piDate"/></div>
-          <div class="f"><label>LC Number</label><input class="mono" id="lcNo" placeholder="LC number"/></div>
+          <div class="f"><label>LC Number</label><input class="mono" id="lcNo" placeholder="LC number" oninput="syncBankLock()"/></div>
           <div class="f"><label>LC Date</label><input type="date" id="lcDate"/></div>
         </div>
         <div class="g2" style="margin-top:14px">
@@ -712,7 +713,23 @@ const BANKS = {
   },
 };
 // Unknown/missing keys (old drafts, Sheet records) fall back to DBS, the previous fixed account.
-function selectedBank() { return BANKS[document.getElementById("bankAccount")?.value] || BANKS.dbs; }
+// An LC shipment is paid into the YES Bank account, so a filled LC number forces it.
+function lcFilled() { return !!(document.getElementById("lcNo")?.value||"").trim(); }
+function selectedBank() {
+  if (lcFilled()) return BANKS.yes_bank;
+  return BANKS[document.getElementById("bankAccount")?.value] || BANKS.dbs;
+}
+// Locks the selector to YES Bank while an LC number is filled; unlocks when cleared.
+function syncBankLock() {
+  const sel = document.getElementById("bankAccount");
+  const note = document.getElementById("bankLockNote");
+  if (!sel) return;
+  const locked = lcFilled();
+  if (locked) sel.value = "yes_bank";
+  sel.disabled = locked;
+  if (note) note.style.display = locked ? "" : "none";
+  updateBankPreview();
+}
 
 // PDF Color palette — Deep Brown + Royal Gold + Ivory
 const BROWN  = [28, 28, 30];
@@ -1142,7 +1159,7 @@ function restoreDraft(d) {
    'qtOFCarrier','qtOFRate','qtOFTransit','qtGrossWt','qtNetWt'].forEach(k=>set(k,d[k]));
   set('invType',d.invType||'commercial');
   set('bankAccount',BANKS[d.bankAccount]?d.bankAccount:'dbs');   // drafts from before the selector were DBS
-  updateBankPreview();
+  syncBankLock();
   if(d.withSeal!=null)document.getElementById('withSeal').checked=!!d.withSeal;
   if(d.qtWtUnit!=null)set('qtWtUnit',normWtUnit(d.qtWtUnit));
   set('ltrRef',d.ltrRef);set('ltrDate',d.ltrDate);set('ltrTo',d.ltrTo);set('ltrSubject',d.ltrSubject);
