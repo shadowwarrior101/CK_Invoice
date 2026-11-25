@@ -262,7 +262,13 @@ nav{background:var(--brown);padding:0 36px;display:flex;align-items:center;justi
   <!-- STEP 0 -->
   <div id="s0">
     <div class="info-box">
-      <strong>Static (pre-filled):</strong> Exporter details, IEC, GST &amp; LUT are fixed for Carbon King LLP. Bank account shown below.
+      <strong>Static (pre-filled):</strong> Exporter details, IEC, GST &amp; LUT are fixed for Carbon King LLP. Select your bank account below.
+    </div>
+    <div class="f" style="margin-bottom:10px;max-width:420px"><label>Bank Account <span>*</span></label>
+      <select id="bankAccount" onchange="updateBankPreview()">
+        <option value="dbs">🇸🇬 DBS Bank Singapore — FAST / SWIFT / MEPS</option>
+        <option value="yes_bank">🇮🇳 YES Bank — Uditnagar Branch (India)</option>
+      </select>
     </div>
     <div id="bankPreview"></div>
     <div class="card">
@@ -679,18 +685,34 @@ const SIG_B64  = "/9j/4AAQSkZJRgABAQAAAQABAAD/2wBDAAYEBQYFBAYGBQYHBwYIChAKCgkJCh
 const MARK = "data:image/png;base64,"+LOGO_B64;
 const LH_LOGO_B64 = "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";
 
-const BANK_INFO = {
-  label: "DBS Bank Limited (Singapore) — Carbon King LLP",
-  rows: [
-    ["Account holder name", "CARBON KING LLP"],
-    ["Payment method",      "FAST / GIRO / MEPS / SWIFT"],
-    ["Account currency",    "USD"],
-    ["Account number",      "885414300179"],
-    ["BIC/SWIFT code",      "DBSSSGSG"],
-    ["Bank name",           "DBS Bank Limited"],
-    ["Beneficiary address", "12 Marina Boulevard, Marina Bay Financial Tower 3, Singapore 018982"],
-  ]
+// Beneficiary accounts; the one chosen in "Bank Account" (step 1) prints on the document.
+const BANKS = {
+  dbs: {
+    label: "DBS Bank Limited (Singapore) — Carbon King LLP",
+    rows: [
+      ["Account holder name", "CARBON KING LLP"],
+      ["Payment method",      "FAST / GIRO / MEPS / SWIFT"],
+      ["Account currency",    "USD"],
+      ["Account number",      "885414300179"],
+      ["BIC/SWIFT code",      "DBSSSGSG"],
+      ["Bank name",           "DBS Bank Limited"],
+      ["Beneficiary address", "12 Marina Boulevard, Marina Bay Financial Tower 3, Singapore 018982"],
+    ]
+  },
+  yes_bank: {
+    label: "YES Bank — Uditnagar Branch (India) — Carbon King LLP",
+    rows: [
+      ["Account holder name", "CARBON KING LLP"],
+      ["Account number",      "008127000000363"],
+      ["IFSC code",           "YESB0000081"],
+      ["Bank name",           "YES BANK"],
+      ["Branch",              "UDITNAGAR"],
+      ["SWIFT code",          "YESBINBBCHN"],
+    ]
+  },
 };
+// Unknown/missing keys (old drafts, Sheet records) fall back to DBS, the previous fixed account.
+function selectedBank() { return BANKS[document.getElementById("bankAccount")?.value] || BANKS.dbs; }
 
 // PDF Color palette — Deep Brown + Royal Gold + Ivory
 const BROWN  = [28, 28, 30];
@@ -720,8 +742,9 @@ const fmt = n  => Number(n).toLocaleString("en-US",{minimumFractionDigits:2,maxi
 function updateBankPreview() {
   const el = document.getElementById("bankPreview");
   if (!el) return;
-  el.innerHTML = "<div style='font-family:Inter Tight,sans-serif;font-size:.72rem;font-weight:700;letter-spacing:.1em;text-transform:uppercase;background:var(--brown);color:var(--lgold);padding:5px 10px;margin-bottom:8px'>" + BANK_INFO.label + "</div>" +
-    BANK_INFO.rows.map(([l,v]) => "<div style='display:grid;grid-template-columns:auto 1fr;gap:8px;padding:3px 6px;font-size:.82rem'><span style='font-family:JetBrains Mono,monospace;color:var(--muted);white-space:nowrap'>" + l + "</span><span style='color:var(--text)'>" + v + "</span></div>").join("");
+  const bank = selectedBank();
+  el.innerHTML = "<div style='font-family:Inter Tight,sans-serif;font-size:.72rem;font-weight:700;letter-spacing:.1em;text-transform:uppercase;background:var(--brown);color:var(--lgold);padding:5px 10px;margin-bottom:8px'>" + bank.label + "</div>" +
+    bank.rows.map(([l,v]) => "<div style='display:grid;grid-template-columns:auto 1fr;gap:8px;padding:3px 6px;font-size:.82rem'><span style='font-family:JetBrains Mono,monospace;color:var(--muted);white-space:nowrap'>" + l + "</span><span style='color:var(--text)'>" + v + "</span></div>").join("");
 }
 
 // ═══════════════════════════════════════════════════
@@ -1069,7 +1092,7 @@ function getDraftData(withLetter=true) {
     ltrBody:letterBodyHTML(),
   } : {};
   return {
-    ...letter,invNo:v("invNo"),invDate:v("invDate"),ctNo:v("ctNo"),ctDate:v("ctDate"),ctType:v("ctType"),inco:v("inco"),
+    ...letter,invNo:v("invNo"),invDate:v("invDate"),ctNo:v("ctNo"),ctDate:v("ctDate"),ctType:v("ctType"),inco:v("inco"),bankAccount:v("bankAccount"),
     piNo:v("piNo"),piDate:v("piDate"),lcNo:v("lcNo"),lcDate:v("lcDate"),lcBank:v("lcBank"),
     payTerms:v("payTerms"),currency:v("currency"),gstType:v("gstType"),consigneeType:v("consigneeType"),consigneeName:v("consigneeName"),
     notifyName:v("notifyName"),notifyAddr:v("notifyAddr"),notifyTax:v("notifyTax"),coo:v("coo"),
@@ -1113,11 +1136,13 @@ function restorePort(id,value){
 function restoreDraft(d) {
   if(!d)return;
   const set=(id,v)=>{const e=document.getElementById(id);if(e&&v!=null)e.value=v;};
-  ['invNo','invDate','ctNo','ctDate','ctType','piNo','piDate','lcNo','lcDate','lcBank','inco','payTerms','currency','gstType','consigneeType','consigneeName',
+  ['invNo','invDate','ctNo','ctDate','ctType','piNo','piDate','lcNo','lcDate','lcBank','bankAccount','inco','payTerms','currency','gstType','consigneeType','consigneeName',
    'notifyName','notifyAddr','notifyTax','coo','grossWt','netWt','pkgCount','pkgType','pkgDesc','pkgTotal','marking',
    'polManual','podManual','qtBuyerCountry','qtAttn','qtAgent','qtTolerance','qtPackaging','qtPONo',
    'qtOFCarrier','qtOFRate','qtOFTransit','qtGrossWt','qtNetWt'].forEach(k=>set(k,d[k]));
   set('invType',d.invType||'commercial');
+  set('bankAccount',BANKS[d.bankAccount]?d.bankAccount:'dbs');   // drafts from before the selector were DBS
+  updateBankPreview();
   if(d.withSeal!=null)document.getElementById('withSeal').checked=!!d.withSeal;
   if(d.qtWtUnit!=null)set('qtWtUnit',normWtUnit(d.qtWtUnit));
   set('ltrRef',d.ltrRef);set('ltrDate',d.ltrDate);set('ltrTo',d.ltrTo);set('ltrSubject',d.ltrSubject);
@@ -1351,7 +1376,7 @@ function buildHTMLDoc() {
   const gst      = computeGST();
   const total    = gst.sub;
   const netTotal = gst.net;
-  const bankRows = BANK_INFO.rows;
+  const bankRows = selectedBank().rows;
   const proforma = isProforma();
   const items    = goodsRows.map((r,i)=>({
     sr:i+1, desc:(r.desc||"").toUpperCase(), hs:esc((r.hscode||"").toUpperCase()),
@@ -1856,7 +1881,7 @@ function buildDoc(jsPDF, isProforma=false) {
   const metaRowH=metas.map(([l,v])=>{const tL=doc.splitTextToSize(l+" : "+(v||""),RW-4);return Math.max(7,tL.length*4.2+3);});
   const pL=doc.splitTextToSize("PAYMENT TERMS : "+payT,RW-4);
   const pH=Math.max(7,pL.length*4.2+3);
-  const bankRows=BANK_INFO.rows;
+  const bankRows=selectedBank().rows;
 
   function drawPageHeader(isPL) {
     let Y=0;

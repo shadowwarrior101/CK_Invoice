@@ -54,3 +54,8 @@
 
 - Long addresses + PI/LC rows pushed the footer onto an almost-blank page 2. Each sheet's content is now wrapped in `.fit`; `ckFit()` (in the generated document) shrinks it with CSS `zoom` until it fits 297mm minus padding. Runs on load, fonts ready, invoice/packing toggle and `beforeprint`. Short documents are untouched (zoom 1).
 - Checked in the browser: the SENA invoice fits at ~96%; a 12-row invoice fits at ~58%, still full width. Not checked: an actual print dialog (Chrome/Safari) and Firefox (needs ≥126 for `zoom`).
+
+## 2026-11-25 — Bank account selector (DBS / YES Bank), as in micbac-invoice
+
+- `BANK_INFO` → `BANKS` map + "Bank Account" select above the bank preview on step 1. Chosen account prints in the invoice/packing list Payment Details (and the unused jsPDF `buildDoc`). Saved in drafts/records; drafts without it load as DBS.
+- YES Bank (Uditnagar): A/C 008127000000363, IFSC YESB0000081, SWIFT YESBINBBCHN. DBS stays the default.
