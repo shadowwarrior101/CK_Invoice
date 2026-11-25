@@ -49,3 +49,8 @@
 **Decisions / deviations**
 - Not added to the Quotation. Also added to the unused jsPDF `buildDoc` so it stays consistent if revived.
 - Rebased onto the ported micbac fixes; verified in the browser before the rebase, syntax-checked after (local server preview was not available).
+
+## 2026-11-25 — Invoice/packing list/quotation always print on one A4 page
+
+- Long addresses + PI/LC rows pushed the footer onto an almost-blank page 2. Each sheet's content is now wrapped in `.fit`; `ckFit()` (in the generated document) shrinks it with CSS `zoom` until it fits 297mm minus padding. Runs on load, fonts ready, invoice/packing toggle and `beforeprint`. Short documents are untouched (zoom 1).
+- Checked in the browser: the SENA invoice fits at ~96%; a 12-row invoice fits at ~58%, still full width. Not checked: an actual print dialog (Chrome/Safari) and Firefox (needs ≥126 for `zoom`).
