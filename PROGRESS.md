@@ -39,3 +39,13 @@
 **Open / next**
 - Invoice RATE column always says "/MT", even for rows in another unit (e.g. BAGS).
 
+
+## 2026-11-25 — Free-text container type, optional PI/LC fields
+
+**Done**
+- Container Type is a free-text input with the old four values as datalist suggestions.
+- Optional Proforma Invoice No./Dated, LC Number/Date, LC Issuing Bank on step 1. Only filled fields print (invoice + packing list ship grid, after Payment Terms); saved in drafts/records.
+
+**Decisions / deviations**
+- Not added to the Quotation. Also added to the unused jsPDF `buildDoc` so it stays consistent if revived.
+- Rebased onto the ported micbac fixes; verified in the browser before the rebase, syntax-checked after (local server preview was not available).

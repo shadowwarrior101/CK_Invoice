@@ -295,12 +295,11 @@ nav{background:var(--brown);padding:0 36px;display:flex;align-items:center;justi
             </select>
           </div>
           <div class="f"><label>Container Type</label>
-            <select id="ctType">
-              <option>FCL 40 FT.</option>
-              <option>FCL 20 FT.</option>
-              <option>FCL 40 HC FT.</option>
-              <option>LCL</option>
-            </select>
+            <input id="ctType" list="ctType-options" placeholder="Select or type container type" autocomplete="off" value="FCL 40 FT."/>
+            <datalist id="ctType-options">
+              <option value="FCL 40 FT."><option value="FCL 20 FT.">
+              <option value="FCL 40 HC FT."><option value="LCL">
+            </datalist>
           </div>
           <div class="f"><label>Inco Terms <span>*</span></label>
             <input id="inco" list="inco-options" placeholder="e.g. FOB - Free on Board" autocomplete="off" value="FOB - Free on Board"/>
@@ -333,6 +332,16 @@ nav{background:var(--brown);padding:0 36px;display:flex;align-items:center;justi
               <option value="cgst_sgst5">CGST + SGST @ 5% (2.5% each)</option>
             </select>
           </div>
+        </div>
+        <div class="sl" style="margin-top:14px">Proforma &amp; LC Details (optional — printed only if filled)</div>
+        <div class="g4">
+          <div class="f"><label>Proforma Invoice No.</label><input class="mono" id="piNo" placeholder="CKLLP/PI/001/26-27"/></div>
+          <div class="f"><label>Proforma Invoice Dated</label><input type="date" id="piDate"/></div>
+          <div class="f"><label>LC Number</label><input class="mono" id="lcNo" placeholder="LC number"/></div>
+          <div class="f"><label>LC Date</label><input type="date" id="lcDate"/></div>
+        </div>
+        <div class="g2" style="margin-top:14px">
+          <div class="f"><label>LC Issuing Bank</label><input id="lcBank" placeholder="Issuing bank name"/></div>
         </div>
       </div>
     </div>
@@ -824,6 +833,12 @@ function addGoodsRow() {
 // ═══════════════════════════════════════════════════
 // SUMMARY
 // ═══════════════════════════════════════════════════
+// Optional PI/LC rows — returned only for fields the user filled, so blank ones never print.
+function getOptionalPILCRows() {
+  return [["PROFORMA INVOICE NO",g("piNo")],["PROFORMA INVOICE DATED",gr("piDate")?fd(gr("piDate")):""],
+    ["LC NUMBER",g("lcNo")],["LC DATE",gr("lcDate")?fd(gr("lcDate")):""],["LC ISSUING BANK",g("lcBank")]]
+    .filter(([,v])=>v);
+}
 function fd(d) {
   if(!d)return"-";const[y,m,dy]=d.split("-");return `${dy}.${m}.${y}`;
 }
@@ -1055,6 +1070,7 @@ function getDraftData(withLetter=true) {
   } : {};
   return {
     ...letter,invNo:v("invNo"),invDate:v("invDate"),ctNo:v("ctNo"),ctDate:v("ctDate"),ctType:v("ctType"),inco:v("inco"),
+    piNo:v("piNo"),piDate:v("piDate"),lcNo:v("lcNo"),lcDate:v("lcDate"),lcBank:v("lcBank"),
     payTerms:v("payTerms"),currency:v("currency"),gstType:v("gstType"),consigneeType:v("consigneeType"),consigneeName:v("consigneeName"),
     notifyName:v("notifyName"),notifyAddr:v("notifyAddr"),notifyTax:v("notifyTax"),coo:v("coo"),
     pol:v("pol"),pod:v("pod"),
@@ -1097,7 +1113,7 @@ function restorePort(id,value){
 function restoreDraft(d) {
   if(!d)return;
   const set=(id,v)=>{const e=document.getElementById(id);if(e&&v!=null)e.value=v;};
-  ['invNo','invDate','ctNo','ctDate','ctType','inco','payTerms','currency','gstType','consigneeType','consigneeName',
+  ['invNo','invDate','ctNo','ctDate','ctType','piNo','piDate','lcNo','lcDate','lcBank','inco','payTerms','currency','gstType','consigneeType','consigneeName',
    'notifyName','notifyAddr','notifyTax','coo','grossWt','netWt','pkgCount','pkgType','pkgDesc','pkgTotal','marking',
    'polManual','podManual','qtBuyerCountry','qtAttn','qtAgent','qtTolerance','qtPackaging','qtPONo',
    'qtOFCarrier','qtOFRate','qtOFTransit','qtGrossWt','qtNetWt'].forEach(k=>set(k,d[k]));
@@ -1356,7 +1372,7 @@ function buildHTMLDoc() {
     +(nTax?'<div class="vsub" style="margin-top:4px;"><span style="color:var(--mute);font-family:var(--mono);font-size:8px;">TAX CODE:</span> '+nTax+'</div>':'')
     +'</div></div>';
 
-  const meta2=[['CONTRACT NO.',ctNo],['CONTRACT DATE',ctDate],['CONTAINER TYPE',ctType],['COUNTRY OF ORIGIN',coo],['PORT OF LOADING',polV],['PORT OF DESTINATION',podV],['INCO TERMS',inco],['PAYMENT TERMS',payT]];
+  const meta2=[['CONTRACT NO.',ctNo],['CONTRACT DATE',ctDate],['CONTAINER TYPE',ctType],['COUNTRY OF ORIGIN',coo],['PORT OF LOADING',polV],['PORT OF DESTINATION',podV],['INCO TERMS',inco],['PAYMENT TERMS',payT],...getOptionalPILCRows().map(([l,v])=>[l,esc(v)])];
   let shipR='';
   for(let i=0;i<meta2.length;i+=2){const a=meta2[i],b=meta2[i+1];
     shipR+='<div class="ship-row"><div><div class="k">'+a[0]+'</div><div class="v">'+a[1]+'</div></div><div><div class="k">'+(b?b[0]:'')+'</div><div class="v">'+(b?b[1]:'')+'</div></div></div>';
@@ -1818,6 +1834,7 @@ function buildDoc(jsPDF, isProforma=false) {
     ["CONTRACT DATE",ctDate,false],["CONTAINER TYPE",ctType,true],
     ["COUNTRY OF ORIGIN",coo,false],["PORT OF LOADING",pol,true],
     ["PORT OF DESTINATION",pod,false],["INCO TERMS",inco,true],
+    ...getOptionalPILCRows().map(([l,v],i)=>[l,v,i%2===1]),
   ];
   fn(5.5,"bold");
   const metaRowH=metas.map(([l,v])=>{const tL=doc.splitTextToSize(l+" : "+(v||""),RW-4);return Math.max(7,tL.length*4.2+3);});
