@@ -60,3 +60,15 @@
 - `BANK_INFO` → `BANKS` map + "Bank Account" select above the bank preview on step 1. Chosen account prints in the invoice/packing list Payment Details (and the unused jsPDF `buildDoc`). Saved in drafts/records; drafts without it load as DBS.
 - YES Bank (Uditnagar): A/C 008127000000363, IFSC YESB0000081, SWIFT YESBINBBCHN. DBS stays the default.
 - A filled LC Number locks the bank to YES Bank (select disabled + note); `selectedBank()` also enforces it, so the document can't print DBS with an LC. Clearing the LC unlocks the select but leaves it on YES Bank.
+
+## 2026-11-28 — Freight/charge rows; net & gross weight on the invoice
+
+**Done**
+- "＋ Add Freight / Charge" adds a charge row (`charge:true`): no HS/unit/qty/bags/gross wt. Amount = rate/MT × goods tonnage when a rate is given (freight $20/MT × 78 MT = $1,560), else a typed lump sum. Charge rows are excluded from tonnage/QTY TOTAL and from the packing list (packing SR renumbered). Same rendering on the quotation.
+- Line maths moved to `js/line-items.js` (`lineAmount`, `goodsQty`, `linesTotal`), unit-tested (`tests/line-items.test.js`, 18 tests pass in total).
+- Form row amounts now refresh live (they were fixed at render), so a per-MT charge follows goods qty changes.
+- Invoice strip under the items now matches the hand-edited CKLLP/022 invoice: NET WEIGHT, GROSS WEIGHT (from step 4, shown when filled), MARKING (only when filled), PACKING. QTY TOTAL removed from the invoice strip (still on the quotation).
+
+**Not done / notes**
+- Unused jsPDF `buildDoc` still assumes every row has a unit/qty; would throw on a charge row if ever revived.
+- The edited invoice also relabelled NET PAYABLE as "TOTAL CPT VALUE"; not changed (not requested).
